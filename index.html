@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffdc35">
+  <meta name="description" content="たかひろと、かぞくみんなのホームランダービー。タップであそべる、やさしいやきゅうゲーム。">
+  <title>みんなのホームランダービー</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23ffdc35'/%3E%3Ccircle cx='32' cy='32' r='20' fill='white' stroke='%23202020' stroke-width='3'/%3E%3Cpath d='M19 18Q35 32 19 46M45 18Q29 32 45 46' fill='none' stroke='%23db594b' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main id="app">
+    <section id="screen-title" class="screen title-screen" aria-labelledby="title-heading">
+      <div class="title-top"><span class="baseball-icon" aria-hidden="true">⚾</span><span>きょうも、みんなで やきゅう！</span></div>
+      <div class="title-copy">
+        <p class="eyebrow">たかひろと、かぞくの。</p>
+        <h1 id="title-heading">みんなの<br><span>ホームラン</span><br>ダービー<span class="title-dot">！</span></h1>
+        <p class="title-lead">おおきく かまえて、かっとばそう。</p>
+      </div>
+      <div class="title-field"><canvas id="title-canvas" width="840" height="600" aria-label="きいろいユニフォームのかぞくと、ねこのとうしゅがいるやきゅうじょう"></canvas><span class="field-sticker">めざせ！<br><strong>ホームラン王</strong></span></div>
+      <div class="title-actions">
+        <button id="start-button" class="button primary jumbo">スタート！</button>
+        <p class="small-note">ひとりでも、かぞくみんなでも。</p>
+      </div>
+      <p class="fan-note">かぞくでたのしむ、ひこうしきファンゲーム</p>
+    </section>
+
+    <section id="screen-players" class="screen page-screen" hidden aria-labelledby="players-heading">
+      <button class="back-button" data-go="title">タイトルにもどる</button>
+      <p class="eyebrow">さあ、だれが うつ？</p>
+      <h2 id="players-heading" tabindex="-1">あそぶひとを<br>えらんでね</h2>
+      <div class="group-heading"><span>かんたんモード</span><small>ボタンを タップするだけ</small></div>
+      <div id="easy-players" class="player-grid easy-grid"></div>
+      <div class="group-heading family-heading"><span>かぞくモード</span><small>ひっぱって、はなす！</small></div>
+      <div id="normal-players" class="player-grid normal-grid"></div>
+      <p class="small-note">きろくは、ひとりずつ ほぞんされるよ。</p>
+    </section>
+
+    <section id="screen-resume" class="screen page-screen centered-screen" hidden aria-labelledby="resume-heading">
+      <button class="back-button" data-go="players">ひとを えらびなおす</button>
+      <div id="resume-portrait" class="big-portrait"></div>
+      <h2 id="resume-heading" tabindex="-1"></h2>
+      <p id="resume-summary" class="description"></p>
+      <div class="stack-actions">
+        <button id="continue-button" class="button primary">つづきから</button>
+        <button id="restart-button" class="button secondary">さいしょから</button>
+      </div>
+      <p id="restart-note" class="small-note"></p>
+    </section>
+
+    <section id="screen-rules" class="screen page-screen" hidden aria-labelledby="rules-heading">
+      <button class="back-button" data-go="players">ひとを えらびなおす</button>
+      <div id="rules-player" class="selected-player"></div>
+      <h2 id="rules-heading" tabindex="-1">あそびかた</h2>
+      <div id="rules-content"></div>
+      <button id="rules-next" class="button primary">わかった！ あそぶ</button>
+      <p class="small-note">パソコンは スペースでスイング。<br>かぞくモードは やじるしキーでも うごかせるよ。</p>
+    </section>
+
+    <section id="screen-stage" class="screen page-screen centered-screen" hidden aria-labelledby="stage-heading">
+      <button class="back-button" data-go="players">ひとを えらびなおす</button>
+      <p id="stage-number" class="stage-chip"></p>
+      <p class="eyebrow">つぎの とうしゅは…</p>
+      <div id="pitcher-portrait" class="pitcher-portrait"></div>
+      <h2 id="stage-heading" tabindex="-1"></h2>
+      <p id="stage-description" class="description"></p>
+      <div id="stage-progress" class="stage-progress" aria-label="ステージのすすみぐあい"></div>
+      <p id="stage-goal" class="goal-note">ホームラン 3ぼんで クリア！</p>
+      <button id="play-button" class="button primary">プレイボール！</button>
+    </section>
+
+    <section id="screen-game" class="screen game-screen" hidden aria-label="ホームランダービー">
+      <header class="game-header">
+        <div class="game-heading"><h2 id="game-stage">1 / 5　ここ</h2><button id="pause-button" class="icon-button" aria-label="いちじていし">Ⅱ</button></div>
+        <div class="score-row"><div class="home-score"><span>ホームラン</span><strong id="home-score">0<span>/3</span></strong></div><div id="out-box" class="out-score"><span>アウト</span><strong id="out-score">0/3</strong></div><span id="easy-badge" class="easy-badge" hidden>ゆっくりで OK！</span></div>
+      </header>
+      <div id="arena" class="arena">
+        <canvas id="game-canvas" tabindex="0" aria-label="おくからくるボールを、てまえのバッターでうとう。スペースでスイング"></canvas>
+        <div id="pitch-message" class="pitch-message" role="status" aria-live="polite">ボールが くるよ！</div>
+        <div id="shot-result" class="shot-result" aria-hidden="true" hidden><span id="result-sound"></span><strong id="result-title"></strong><span id="result-detail"></span></div>
+        <div class="field-label" aria-hidden="true">みんなの ホームスタジアム</div>
+      </div>
+      <div class="game-controls">
+        <div class="control-meta"><span id="batter-name"></span><button id="sound-button" class="text-button" aria-pressed="true">おと：オン</button></div>
+        <div id="easy-controls"><p id="easy-hint" class="control-hint">ボールが きたら タップ！</p><button id="swing-button" class="button primary swing-button" disabled>うつ！</button></div>
+        <div id="normal-controls" hidden><p class="control-hint">バットを ひっぱって、はなす！</p><div id="bat-pad" class="bat-pad" tabindex="0" role="group" aria-label="バットのいち。ひっぱってはなすとスイング。やじるしキーとスペースでもあそべます。"><span class="pad-axis horizontal"></span><span class="pad-axis vertical"></span><span class="pad-label">ここで バットを うごかす</span><span id="bat-handle" class="bat-handle" aria-hidden="true"><svg viewBox="0 0 72 36"><path d="M12 29L21 23 48 5Q57 0 61 7T56 20L26 29 16 34Z" fill="#d89a53" stroke="#202820" stroke-width="3"/><path d="M16 27L22 32M22 23L28 29" stroke="#fff4d0" stroke-width="3"/></svg></span></div></div>
+      </div>
+      <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-heading" hidden><div class="pause-card"><span class="pause-symbol" aria-hidden="true">Ⅱ</span><h2 id="pause-heading" tabindex="-1">ひとやすみ</h2><p>きろくは ほぞんしてあるよ。</p><button id="unpause-button" class="button primary">つづける</button><button id="leave-button" class="button secondary">ひとを えらびなおす</button></div></div>
+    </section>
+
+    <section id="screen-clear" class="screen page-screen centered-screen celebration-screen" hidden aria-labelledby="clear-heading">
+      <div class="success-emblem" aria-hidden="true">★</div><p id="clear-stage" class="stage-chip"></p>
+      <h2 id="clear-heading" tabindex="-1">ステージ<br>クリア！</h2><p id="clear-message" class="description"></p>
+      <div class="three-balls" aria-label="ホームラン3ぼん">⚾ ⚾ ⚾</div>
+      <button id="next-stage-button" class="button primary">つぎのとうしへ！</button><button class="text-button roomy" data-go="players">きょうは ここまで</button>
+    </section>
+
+    <section id="screen-gameover" class="screen page-screen centered-screen" hidden aria-labelledby="gameover-heading">
+      <div class="retry-emblem" aria-hidden="true">⚾</div><p id="gameover-stage" class="stage-chip"></p>
+      <h2 id="gameover-heading" tabindex="-1">ざんねん！<br>もういちど！</h2><p class="description">だいじょうぶ。<br>このステージから やりなおせるよ。</p><p class="goal-note">ホームラン 0/3・アウト 0/3で スタート</p>
+      <button id="retry-button" class="button primary">もういちど！</button><button class="text-button roomy" data-go="players">ひとやすみする</button>
+    </section>
+
+    <section id="screen-ending" class="screen page-screen ending-screen" hidden aria-labelledby="ending-heading">
+      <div id="ending-confetti" class="ending-confetti" aria-hidden="true"></div>
+      <p class="stage-chip">ぜんステージ クリア！</p>
+      <div class="ending-picture"><div id="family-celebration" class="family-celebration"></div></div>
+      <div class="ending-winner">
+        <div class="winner-icon"><span class="winner-crown" aria-hidden="true">♛</span><div id="ending-player-icon"></div></div>
+        <h2 id="ending-heading" tabindex="-1"></h2>
+      </div>
+      <div class="ending-message"><p class="ending-congratulations">おめでとう！</p><p class="ending-cheer">きょうのヒーローは、きみだね。<br>かぞくみんなの、じまんだよ！</p></div>
+      <div class="ending-actions">
+        <button id="ending-replay" class="button primary">もういちど！<small>このひとで ステージ1から</small></button>
+        <div class="ending-links"><button id="ending-players" class="text-button">ほかのひとで あそぶ</button><button class="text-button" data-go="title">タイトルにもどる</button></div>
+      </div>
+    </section>
+    <div id="storage-warning" class="storage-warning" role="status" hidden>このブラウザでは きろくを ほぞんできないよ。<br>ゲームは そのまま あそべるよ。</div>
+    <noscript>このゲームをあそぶには、ブラウザのJavaScriptをオンにしてください。</noscript>
+  </main>
+</body>
+</html>
